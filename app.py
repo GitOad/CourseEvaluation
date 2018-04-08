@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from passlib.apps import custom_app_context as pwd_context
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()	
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
@@ -11,13 +12,13 @@ courses = [
 	{
 		'id': 1,
        	'title': u'Software Architecture',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
+        'description': u'Software architecture refers to the high level structures of a software system, the discipline of creating such structures, and the documentation of these structures.',
         'done': False
 	},
 	{
 		'id': 2,
         'title': u'Software Management',
-        'description': u'Need to find a good Python tutorial on the web',
+        'description': u'Software project management is an art and science of planning and leading software projects.',
         'done': False
 	}
 ]
@@ -29,6 +30,7 @@ courses = [
 
 # GET one specific course
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['GET'])
+@auth.login_required
 def get_course(course_id):
 	course = list(filter(lambda t: t['id'] == course_id, courses))
 	if len(course) == 0:
@@ -42,6 +44,7 @@ def not_found(error):
 
 # POST a new course
 @app.route('/ce/api/v1.0/courses', methods=['POST'])
+@auth.login_required
 def create_course():
 	if not request.json or not 'title' in request.json:
 		abort(400)
@@ -56,6 +59,7 @@ def create_course():
 
 # PUT an update
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['PUT'])
+@auth.login_required
 def update_course(course_id):
 	course = list(filter(lambda t: t['id'] == course_id, courses))
 	if len(course) == 0:
@@ -75,6 +79,7 @@ def update_course(course_id):
 
 # DELETE a course
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['DELETE'])
+@auth.login_required
 def delete_course(course_id):
     course = list(filter(lambda t: t['id'] == course_id, courses))
     if len(course) == 0:
@@ -97,22 +102,21 @@ def make_client_course(course):
 # 	return jsonify({'courses': list(map(make_client_course, courses))})
  
 # strengthen security: login session
-auth = HTTPBasicAuth()
 
-@auth.get_password
-def get_password(username):
-	if username == 'miguel':
-		return 'python'
-	return None
+# @auth.get_password
+# def get_password(username):
+# 	if username == 'miguel':
+# 		return 'python'
+# 	return None
 
 @auth.error_handler
 def unauthorized():
 	return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
-@app.route('/ce/api/v1.0/courses', methods=['GET'])
-@auth.login_required
-def get_courses():
-	return jsonify({'courses': list(map(make_client_course, courses))})
+# @app.route('/ce/api/v1.0/courses', methods=['GET'])
+# @auth.login_required
+# def get_courses():
+# 	return jsonify({'courses': list(map(make_client_course, courses))})
 
 db = SQLAlchemy(app)
 class User(db.Model):
@@ -152,10 +156,12 @@ def get_user(id):
 		abort(400)
 	return jsonify({'username': user.username})
 
-@app.route('/api/resource')
+@app.route('/ce/api/v1.0/courses')
 @auth.login_required
-def get_resource():
-	return jsonify({'data': 'Hello, %s!' % g.user.username})
+# def get_resource():
+# 	return jsonify({'data': 'Hello, %s!' % g.user.username})
+def get_courses():
+	return jsonify({'courses': courses})
 
 @auth.verify_password
 def verify_password(username, password):
