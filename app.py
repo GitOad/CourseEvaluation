@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, abort, make_response, request, url_for, g
-from flask.ext.httpauth import HTTPBasicAuth
+from flask_cors import CORS
+from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 from passlib.apps import custom_app_context as pwd_context
 
 app = Flask(__name__)
+CORS(app)
 auth = HTTPBasicAuth()	
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -30,12 +32,12 @@ courses = [
 
 # GET one specific course
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['GET'])
-@auth.login_required
+# @auth.login_required
 def get_course(course_id):
 	course = list(filter(lambda t: t['id'] == course_id, courses))
 	if len(course) == 0:
 		abort(404)
-	return jsonify({'course': course[0]})
+	return jsonify( course[0] )
 
 # transfer error page into JSON format
 @app.errorhandler(404)
@@ -44,7 +46,7 @@ def not_found(error):
 
 # POST a new course
 @app.route('/ce/api/v1.0/courses', methods=['POST'])
-@auth.login_required
+# @auth.login_required
 def create_course():
 	if not request.json or not 'title' in request.json:
 		abort(400)
@@ -59,17 +61,17 @@ def create_course():
 
 # PUT an update
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['PUT'])
-@auth.login_required
+# @auth.login_required
 def update_course(course_id):
 	course = list(filter(lambda t: t['id'] == course_id, courses))
 	if len(course) == 0:
 		abort(404)
 	if not request.json:
 		abort(400)
-	if 'title' in request.json and type(request.json['title']) != unicode:
-		abort(400)
-	if 'description' in request.json and type(request.json['description']) is not unicode:
-		abort(400)
+	# if 'title' in request.json and type(request.json['title']) != unicode:
+	# 	abort(400)
+	# if 'description' in request.json and type(request.json['description']) is not unicode:
+	# 	abort(400)
 	if 'done' in request.json and type(request.json['done']) is not bool:
 		abort(400)
 	course[0]['title'] = request.json.get('title', course[0]['title'])
@@ -79,7 +81,7 @@ def update_course(course_id):
 
 # DELETE a course
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['DELETE'])
-@auth.login_required
+# @auth.login_required
 def delete_course(course_id):
     course = list(filter(lambda t: t['id'] == course_id, courses))
     if len(course) == 0:
@@ -114,7 +116,7 @@ def unauthorized():
 	return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
 # @app.route('/ce/api/v1.0/courses', methods=['GET'])
-# @auth.login_required
+# # @auth.login_required
 # def get_courses():
 # 	return jsonify({'courses': list(map(make_client_course, courses))})
 
@@ -157,11 +159,11 @@ def get_user(id):
 	return jsonify({'username': user.username})
 
 @app.route('/ce/api/v1.0/courses')
-@auth.login_required
+# @auth.login_required
 # def get_resource():
 # 	return jsonify({'data': 'Hello, %s!' % g.user.username})
 def get_courses():
-	return jsonify({'courses': courses})
+	return jsonify( courses )
 
 @auth.verify_password
 def verify_password(username, password):
