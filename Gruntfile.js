@@ -109,8 +109,8 @@ module.exports = function (grunt) {
                     },
                 src: [
                     //"demo/demo.js",
-                    //"models/courses.js",
-                    "models/courses.data.js"
+                    //"models/course.js",
+                    "models/course.data.js"
                 ],
                 dest: 'demo/demo-data.js'
             }

@@ -57,7 +57,7 @@ def create_course():
         'done': False
 	}	
 	courses.append(course)
-	return jsonify({'course': course}), 201
+	return jsonify( course ), 201
 
 # PUT an update
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['PUT'])
@@ -77,7 +77,7 @@ def update_course(course_id):
 	course[0]['title'] = request.json.get('title', course[0]['title'])
 	course[0]['description'] = request.json.get('description', course[0]['description'])
 	course[0]['done'] = request.json.get('done', course[0]['done'])
-	return jsonify({'course': course[0]})
+	return jsonify( course[0] )
 
 # DELETE a course
 @app.route('/ce/api/v1.0/courses/<int:course_id>', methods=['DELETE'])
@@ -163,7 +163,7 @@ def get_user(id):
 # def get_resource():
 # 	return jsonify({'data': 'Hello, %s!' % g.user.username})
 def get_courses():
-	return jsonify( courses )
+	return jsonify({'courses': courses})
 
 @auth.verify_password
 def verify_password(username, password):
@@ -174,4 +174,4 @@ def verify_password(username, password):
 	return True
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')
