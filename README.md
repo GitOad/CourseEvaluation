@@ -68,10 +68,32 @@ Choose Consul for simplicity by leverage Docker official Consul image.
 ```
 docker run -d --name=consul -p 8500:8500 -p 8400:8400 gliderlabs/consul-server -bootstrap -client 0.0.0.0 -ui
 # docker run -d --name=consul -p 8500:8500 -p 8400:8400 consul agent -bootstrap -client 0.0.0.0 -ui
+docker run --rm --name consul -p 8500:8500 -p 8400:8400 consul agent -server -bootstrap -client 0.0.0.0 -ui
+
+
+# run as a client
+docker run --rm --name consul1 --link consul consul agent -bind=0.0.0.0 -retry-join=consul
 ```
 Then consul will provide a simple UI at http://localhost:8500, access it to make sure the installation is successful.
 
 #### Start backend services
 ```
-docker run -d --rm --name backend -p 5000:5000 -v "$PWD":/app -w /app ce-server python backend.py
+docker run -it --rm --name backend -p 5000:5000 -v "$PWD":/app -w /app ce-server python backend.py
 ```
+
+
+#### Query service address
+
+##### From DNS
+1. Query IP from A record
+```
+docker exec ce_consului_1 dig @172.20.0.2 -p 8600 redis.service.consul
+
+# See only answer part:
+docker exec ce_consului_1 dig +noall +answer @172.20.0.2 -p 8600 redis.service.consul
+```
+2. Query port from SRV record
+```
+docker exec ce_consului_1 dig srv +noall +answer @172.20.0.2 -p 8600 redis.service.consul
+```
+
