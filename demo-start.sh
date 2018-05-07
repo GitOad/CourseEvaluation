@@ -1,2 +1,3 @@
-docker run --rm --name web -p 5000:5000 -v "$PWD":/app -w /app python:alpine python -m http.server 8000
-docker run -d --name=consul -p 8500:8500 -p 8400:8400 gliderlabs/consul-server -bootstrap -client 0.0.0.0 -ui
+# Start Consul and our backend services - redis, backend - as docker containers
+# The number of Consul instances should be above a quorum of three
+docker-compose -p ce up -d --scale consul=3
