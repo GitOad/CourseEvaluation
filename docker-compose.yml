@@ -31,12 +31,12 @@ services:
             - './wait-for consului:8600 -- python backend.py'
 #            - python
 #            - /app/backend.py
-    dnsresolver:
-        image: ce-server
-        volumes:
-            - .:/app
-        depends_on:
-            - consului
-        entrypoint:
-            - python
-            - /app/dns_resolver.py
+#    dnsresolver:
+#        image: ce-server
+#        volumes:
+#            - .:/app
+#        depends_on:
+#            - consului
+#        entrypoint:
+#            - python
+#            - /app/dns_resolver.py
